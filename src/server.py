@@ -1,11 +1,6 @@
 import Queue
-from threading import Thread
-import time
-from random import randrange
 import zerorpc
-from gevent import monkey
-
-#monkey.patch_all()
+from multiprocessing import Process
 
 # initialize an RPC Connected object
 class HelloRPC(object):
@@ -14,42 +9,33 @@ class HelloRPC(object):
 
 		return "HELLO %s" % name
 
-
 queue = Queue.Queue()
 
-class ServerThread(Thread):
+# create a server
+def createServer(port):
 
-	def __init__(self, queue, port):
+	host = "tcp://0.0.0.0:%s" % port
+	
+	# print an initialization message
+	print "Running on %s" % host
 
-		Thread.__init__(self)	
-		self.queue = queue
-		self.port = port
+	# initialize the zerorpc side of things
+	server = zerorpc.Server(HelloRPC())	
+	server.bind(host)
+	server.run()
 
-	def run(self):
-
-		host = "tcp://0.0.0.0:%s" % self.port
-		
-		time.sleep(randrange(5,10))
-
-		# print an initialization message
-		print "Running on %s" % host
-
-		# initialize the zerorpc side of things
-		server = zerorpc.Server(HelloRPC())	
-		#server.bind(host)
-		#server.run()
+	return host
 
 	
 # initialize ports that we are listening on here
 ports = [4242, 4243, 4244]
 
-# now create a thread for each of the ports etc
-for port in ports: 
+# if this is the main process, then go ahead and create processes   
+if __name__ == "__main__":
 
-	t = ServerThread(queue, port)
-	t.start()
+	# now create a thread for each of the ports etc
+	for port in ports: 
 
-
-	
-
-	
+		# create a new server and put it in the queue
+		p = Process(target=createServer, args=(port,))	
+		p.start()				
