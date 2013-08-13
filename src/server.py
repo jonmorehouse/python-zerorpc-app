@@ -1,9 +1,11 @@
-import zerorpc
-from threading import Thread
 import Queue
+from threading import Thread
+import time
+from random import randrange
+import zerorpc
 from gevent import monkey
 
-monkey.patch_all()
+#monkey.patch_all()
 
 # initialize an RPC Connected object
 class HelloRPC(object):
@@ -27,13 +29,15 @@ class ServerThread(Thread):
 
 		host = "tcp://0.0.0.0:%s" % self.port
 		
+		time.sleep(randrange(5,10))
+
 		# print an initialization message
 		print "Running on %s" % host
 
 		# initialize the zerorpc side of things
 		server = zerorpc.Server(HelloRPC())	
-		server.bind(host)
-		server.run()
+		#server.bind(host)
+		#server.run()
 
 	
 # initialize ports that we are listening on here
