@@ -9,6 +9,7 @@ class HelloRPC(object):
 
 		return "HELLO %s" % name
 
+# initialize a queue to hold all processes
 queue = Queue.Queue()
 
 # create a server
@@ -38,4 +39,9 @@ if __name__ == "__main__":
 
 		# create a new server and put it in the queue
 		p = Process(target=createServer, args=(port,))	
+
+		# start this thread 
 		p.start()				
+
+
+
